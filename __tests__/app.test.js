@@ -24,7 +24,6 @@ describe('voting app routes', () => {
     return mongod.stop();
   });
 
-
   it('it creates an organization', () => {
     return request(app)
       .post('/api/v1/organizations')
@@ -118,7 +117,6 @@ describe('voting app routes', () => {
       });
   });
 
-
   it('it creates a new user', () => {
     return request(app)
       .post('/api/v1/users')
@@ -210,5 +208,4 @@ describe('voting app routes', () => {
         });
       });
   });
-
 });
