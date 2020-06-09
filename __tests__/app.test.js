@@ -118,4 +118,97 @@ describe('voting app routes', () => {
       });
   });
 
+
+  it('it creates a new user', () => {
+    return request(app)
+      .post('/api/v1/users')
+      .send({
+        name: 'Jake',
+        phone: '123-123-4567',
+        email: 'placeholder@email.com',
+        communicationMedium: 'email',
+        imageUrl: 'Image url placeholder'
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          name: 'Jake',
+          phone: '123-123-4567',
+          email: 'placeholder@email.com',
+          communicationMedium: 'email',
+          imageUrl: 'Image url placeholder',
+          __v: 0
+        });
+      });
+  });
+
+  it('it gets a user by id with GET', () => {
+    return User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    })
+      .then(user => request(app).get(`/api/v1/users/${user._id}`))
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          name: 'Jake',
+          phone: '123-123-4567',
+          email: 'placeholder@email.com',
+          communicationMedium: 'email',
+          imageUrl: 'Image url placeholder',
+          __v: 0
+        });
+      });
+  });
+
+  it('it updates a user by id with PATCH', () => {
+    return User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    })
+      .then(user => {
+        return  request(app).patch(`/api/v1/users/${user._id}`)
+          .send({ name: 'SUPER DOPE NAME CHANGE PATCH STYLE' });
+      })      
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          name: 'SUPER DOPE NAME CHANGE PATCH STYLE',
+          phone: '123-123-4567',
+          email: 'placeholder@email.com',
+          communicationMedium: 'email',
+          imageUrl: 'Image url placeholder',
+          __v: 0
+        });
+      });
+  });
+
+  it('it deletes a user by id with DELETE', () => {
+    return User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    })
+      .then(user => request(app).delete(`/api/v1/users/${user._id}`))
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          name: 'Jake',
+          phone: '123-123-4567',
+          email: 'placeholder@email.com',
+          communicationMedium: 'email',
+          imageUrl: 'Image url placeholder',
+          __v: 0
+        });
+      });
+  });
+
 });
