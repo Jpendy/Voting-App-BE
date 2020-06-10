@@ -9,6 +9,7 @@ const app = require('../lib/app');
 const Organization = require('../lib/models/Organization');
 const User = require('../lib/models/User');
 const Poll = require('../lib/models/Poll');
+const Membership = require('../lib/models/Membership');
 
 describe('voting app routes', () => {
   beforeAll(async() => {
@@ -386,8 +387,38 @@ describe('voting app routes', () => {
           __v: 0
         });
       });
-
   });
 
+  it('it deletes a membership by id with DELETE', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+    
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const member = await Membership.create({
+      organization: org._id,
+      user: user._id
+    });
+      
+    return request(app).delete(`/api/v1/memberships/${member._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: member.id,
+          organization: org.id,
+          user: user.id,
+          __v: 0
+        });
+      });
+
+  });
 
 });
