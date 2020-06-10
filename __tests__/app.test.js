@@ -8,6 +8,7 @@ const app = require('../lib/app');
 
 const Organization = require('../lib/models/Organization');
 const User = require('../lib/models/User');
+const Poll = require('../lib/models/Poll');
 
 describe('voting app routes', () => {
   beforeAll(async() => {
@@ -208,4 +209,144 @@ describe('voting app routes', () => {
         });
       });
   });
+
+  it('it creates a new poll with POST', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    return request(app)
+      .post('/api/v1/polls')
+      .send({
+        organization: org._id,
+        title: 'Cool Poll',
+        description: 'Super cool poll',
+        options: ['approve', 'disapprove']
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          organization: org.id,
+          title: 'Cool Poll',
+          description: 'Super cool poll',
+          options: ['approve', 'disapprove'],
+          __v: 0
+        });
+      });
+  });
+
+  it('it gets all polls from an organization', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    return request(app)
+      .get(`/api/v1/polls?organization=${org.id}`)
+      .then(res => {
+        expect(res.body).toEqual([{
+
+          _id: poll.id,
+          description: 'Super cool poll',
+          options: ['approve', 'disapprove'],
+          organization: {
+            _id: org.id,
+            title: 'Cool Organization'
+          },
+          title: 'Cool Poll',
+          __v: 0
+
+        }]);
+      });        
+  });
+
+
+  // it('it gets a poll by id with GET', async() => {
+  //   const org = await Organization.create({
+  //     title: 'Cool Organization',
+  //     description: 'Cool description',
+  //     imageUrl: 'Image url placeholder'
+  //   });
+
+  //   const poll = await Poll.create({
+  //     organization: org._id,
+  //     title: 'Cool Poll',
+  //     description: 'Super cool poll',
+  //     options: ['approve', 'disapprove']
+  //   });
+
+  //   return request(app).get(`/api/v1/polls/${poll._id}`)
+  //     .then(res => {
+  //       expect(res.body).toEqual({
+
+  //       });
+  //     });
+  // });
+
+  it('it updates a poll by id with PATCH', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    return request(app).patch(`/api/v1/polls/${poll._id}`)
+      .send({ description: 'Worst poll ever' })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: poll.id,
+          organization: org.id,
+          title: 'Cool Poll',
+          description: 'Worst poll ever',
+          options: ['approve', 'disapprove'],
+          __v: 0
+        });
+      });
+  });
+
+  it('deletes a poll by id with DELETE', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    return request(app).delete(`/api/v1/polls/${poll._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: poll.id,
+          organization: org.id,
+          title: 'Cool Poll',
+          description: 'Super cool poll',
+          options: ['approve', 'disapprove'],
+          __v: 0
+        });
+      });
+
+  });
+
 });
