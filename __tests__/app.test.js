@@ -279,27 +279,40 @@ describe('voting app routes', () => {
   });
 
 
-  // it('it gets a poll by id with GET', async() => {
-  //   const org = await Organization.create({
-  //     title: 'Cool Organization',
-  //     description: 'Cool description',
-  //     imageUrl: 'Image url placeholder'
-  //   });
+  it('it gets a poll and organization info by id with GET', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
 
-  //   const poll = await Poll.create({
-  //     organization: org._id,
-  //     title: 'Cool Poll',
-  //     description: 'Super cool poll',
-  //     options: ['approve', 'disapprove']
-  //   });
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
 
-  //   return request(app).get(`/api/v1/polls/${poll._id}`)
-  //     .then(res => {
-  //       expect(res.body).toEqual({
+    return request(app).get(`/api/v1/polls/${poll._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
 
-  //       });
-  //     });
-  // });
+          _id: poll.id,
+          description: 'Super cool poll',
+          options: ['approve', 'disapprove'],
+          __v: 0,
+          organization: {
+            _id: org.id,
+            description: 'Cool description',
+            imageUrl: 'Image url placeholder',
+            title: 'Cool Organization',
+            __v: 0
+          },
+          
+          title: 'Cool Poll'
+        });
+      });
+  });
 
   it('it updates a poll by id with PATCH', async() => {
     const org = await Organization.create({
