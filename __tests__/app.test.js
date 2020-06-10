@@ -44,6 +44,8 @@ describe('voting app routes', () => {
       });
   });
 
+
+  //Organization tests
   it('it gets all organization but leaves out the description', () => {
     return Organization.create({
       title: 'Cool Organization',
@@ -118,6 +120,8 @@ describe('voting app routes', () => {
       });
   });
 
+
+  //User tests
   it('it creates a new user', () => {
     return request(app)
       .post('/api/v1/users')
@@ -209,6 +213,9 @@ describe('voting app routes', () => {
         });
       });
   });
+
+
+  // Poll tests
 
   it('it creates a new poll with POST', async() => {
     const org = await Organization.create({
@@ -348,5 +355,39 @@ describe('voting app routes', () => {
       });
 
   });
+
+
+  // Membership tests
+  it('it creates a new member with POST', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+    
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    return request(app).post('/api/v1/memberships')
+      .send({
+        organization: org._id,
+        user: user._id
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          organization: org.id,
+          user: user.id,
+          __v: 0
+        });
+      });
+
+  });
+
 
 });
