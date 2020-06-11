@@ -10,6 +10,7 @@ const Organization = require('../lib/models/Organization');
 const User = require('../lib/models/User');
 const Poll = require('../lib/models/Poll');
 const Membership = require('../lib/models/Membership');
+const Vote = require('../lib/models/Vote');
 
 describe('voting app routes', () => {
   beforeAll(async() => {
@@ -46,8 +47,9 @@ describe('voting app routes', () => {
   });
 
 
-  //Organization tests
-  it('it gets all organization but leaves out the description', () => {
+  /////////////Organization tests
+
+  it('it gets all organizations but leaves out the description', () => {
     return Organization.create({
       title: 'Cool Organization',
       description: 'Cool description',
@@ -122,7 +124,8 @@ describe('voting app routes', () => {
   });
 
 
-  //User tests
+  //////////////User tests
+
   it('it creates a new user', () => {
     return request(app)
       .post('/api/v1/users')
@@ -216,7 +219,7 @@ describe('voting app routes', () => {
   });
 
 
-  // Poll tests
+  //////////////// Poll tests
 
   it('it creates a new poll with POST', async() => {
     const org = await Organization.create({
@@ -370,7 +373,8 @@ describe('voting app routes', () => {
   });
 
 
-  // Membership tests
+  ///////////////////Membership tests
+
   it('it creates a new member with POST', async() => {
     const org = await Organization.create({
       title: 'Cool Organization',
@@ -487,6 +491,156 @@ describe('voting app routes', () => {
         });
       });
 
+  });
+
+
+
+  ///////////////Vote tests
+
+  it('it creates a new vote with POST', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+    
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    return request(app).post('/api/v1/votes/')
+      .send({ poll: poll._id, user: user._id, options: 'yes' })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          poll: poll.id, 
+          user: user.id, 
+          options: 'yes',
+          __v: 0
+        });
+      });
+  });
+
+  it('it gets all votes on a poll by id with GET', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const vote = await Vote.create({
+      poll: poll._id, user: user._id, options: 'approve'
+    });
+
+    return request(app)
+      .get(`/api/v1/votes?poll=${poll.id}`)
+      .then(res => {
+        expect(res.body).toEqual(
+          [{ '__v': 0, '_id': expect.anything(), 'options': 'approve', 'poll': { '__v': 0, '_id': expect.anything(), 'description': 'Super cool poll', 'options': ['approve', 'disapprove'], 'organization': expect.anything(), 'title': 'Cool Poll' }, 'user': expect.anything() }]
+        );
+      });
+  });
+
+  it('it gets all votes by a user by id with GET', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const vote = await Vote.create({
+      poll: poll._id, user: user._id, options: 'yes'
+    });
+
+    return request(app)
+      .get(`/api/v1/votes/user/${user._id}`)
+      .then(res => {
+        expect(res.body).toEqual(
+          [{ '_id': expect.anything(), 'options': 'yes', 'poll': expect.anything() }]
+        );
+      });
+  });
+
+  it('it updates a vote by it\'s id with PATCH', async() => {
+
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    const vote = await Vote.create({
+      poll: poll._id, user: user._id, options: 'yes'
+    });
+
+    return request(app)
+      .patch(`/api/v1/votes/${vote._id}`)
+      .send({ options: 'no' })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.anything(),
+          poll: poll.id, 
+          user: user.id, 
+          options: 'no',
+          __v: 0
+        });
+      });
   });
 
 });
