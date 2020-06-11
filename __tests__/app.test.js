@@ -142,6 +142,11 @@ describe('voting app routes', () => {
           imageUrl: 'Image url placeholder',
           __v: 0
         });
+
+        return Poll.find({ organization: org._id });
+      })
+      .then(polls => {
+        expect(polls).toEqual([]);
       });
   });
 
@@ -367,7 +372,7 @@ describe('voting app routes', () => {
       });
   });
 
-  it('deletes a poll by id with DELETE', async() => {
+  it('deletes a poll by id and all associated votes with DELETE', async() => {
     const org = await Organization.create({
       title: 'Cool Organization',
       description: 'Cool description',
@@ -381,7 +386,8 @@ describe('voting app routes', () => {
       options: ['approve', 'disapprove']
     });
 
-    return request(app).delete(`/api/v1/polls/${poll._id}`)
+    return request(app)
+      .delete(`/api/v1/polls/${poll._id}`)
       .then(res => {
         expect(res.body).toEqual({
           _id: poll.id,
@@ -391,6 +397,11 @@ describe('voting app routes', () => {
           options: ['approve', 'disapprove'],
           __v: 0
         });
+
+        return Vote.find({ poll: poll._id });
+      })
+      .then(votes => {
+        expect(votes).toEqual([]);
       });
 
   });
