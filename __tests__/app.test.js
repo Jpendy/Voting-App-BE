@@ -471,6 +471,11 @@ describe('voting app routes', () => {
           user: user.id,
           __v: 0
         });
+
+        return Vote.find({ user: member.user });
+      })
+      .then(votes => {
+        expect(votes).toEqual([]);
       });
 
   });
