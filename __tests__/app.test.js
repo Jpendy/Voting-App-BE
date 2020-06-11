@@ -57,8 +57,9 @@ describe('voting app routes', () => {
     vote = await Vote.create({
       poll: poll._id, user: user._id, options: 'yes'
     });
+    
   });
-  
+
 
   it('it creates an organization', () => {
     return request(app)
@@ -95,12 +96,8 @@ describe('voting app routes', () => {
   });
 
   it('it get an organization by id with GET', () => {
-    return Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    })
-      .then(organization => request(app).get(`/api/v1/organizations/${organization._id}`))
+   
+    return request(app).get(`/api/v1/organizations/${org._id}`)
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.anything(),
@@ -135,12 +132,8 @@ describe('voting app routes', () => {
   });
 
   it('it deletes an organization by id with DELETE and deletes all polls and votes associated with that organization', async() => {
-    return Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    }) 
-      .then(organization => request(app).delete(`/api/v1/organizations/${organization._id}`))
+    
+    return request(app).delete(`/api/v1/organizations/${org._id}`)
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.anything(),
