@@ -452,7 +452,7 @@ describe('voting app routes', () => {
     return request(app).get(`/api/v1/memberships?user=${user._id}`)
       .then(res => {
         expect(res.body).toEqual(
-          [{ '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization'}, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder'} }]
+          [{ '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization'}, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder' } }]
         );
       });
   });
