@@ -307,8 +307,7 @@ describe('voting app routes', () => {
             imageUrl: 'Image url placeholder',
             title: 'Cool Organization',
             __v: 0
-          },
-          
+          },          
           title: 'Cool Poll'
         });
       });
@@ -399,6 +398,62 @@ describe('voting app routes', () => {
           user: user.id,
           __v: 0
         });
+      });
+  });
+
+  it('it gets all users in an organization', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+    
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    await Membership.create({
+      organization: org._id,
+      user: user._id
+    });
+
+    return request(app).get(`/api/v1/memberships?organization=${org._id}`)
+      .then(res => {
+        expect(res.body).toEqual(
+          [{ __v: 0, _id: expect.anything(), organization: { _id: expect.anything(), imageUrl: 'Image url placeholder', title: 'Cool Organization' }, user: { _id: expect.anything(), imageUrl: 'Image url placeholder' } }]
+        );
+      });
+  });
+
+  it('it gets all organizations a user is part of', async() => {
+    const org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+    
+    const user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    await Membership.create({
+      organization: org._id,
+      user: user._id
+    });
+
+    return request(app).get(`/api/v1/memberships?user=${user._id}`)
+      .then(res => {
+        expect(res.body).toEqual(
+          [{ '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization'}, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder'} }]
+        );
       });
   });
 
