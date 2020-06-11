@@ -31,6 +31,7 @@ describe('voting app routes', () => {
   let user;
   let poll;
   let vote;
+  let member;
 
   beforeEach(async() => {
     org = await Organization.create({
@@ -56,6 +57,11 @@ describe('voting app routes', () => {
 
     vote = await Vote.create({
       poll: poll._id, user: user._id, options: 'yes'
+    });
+
+    member = await Membership.create({
+      organization: org._id,
+      user: user._id
     });
     
   });
@@ -95,19 +101,27 @@ describe('voting app routes', () => {
       });     
   });
 
-  it('it get an organization by id with GET', () => {
+  it.only('it get an organization and all it\'s members by id with GET', () => {
    
-    return request(app).get(`/api/v1/organizations/${org._id}`)
+    return request(app)
+      .get(`/api/v1/organizations/${org._id}`)
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.anything(),
           title: 'Cool Organization',
           description: 'Cool description',
           imageUrl: 'Image url placeholder',
-          __v: 0
+          __v: 0,
+          memberships: [{
+            _id: member.id,
+            organization: org.id,
+            user: user.id,
+            __v: 0
+          }]
         });
       });
   });
+
 
   it('it updates an organization by id with PATCH', () => {
     return Organization.create({
