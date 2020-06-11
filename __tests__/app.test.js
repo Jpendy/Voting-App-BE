@@ -27,6 +27,39 @@ describe('voting app routes', () => {
     return mongod.stop();
   });
 
+  let org;
+  let user;
+  let poll;
+  let vote;
+
+  beforeEach(async() => {
+    org = await Organization.create({
+      title: 'Cool Organization',
+      description: 'Cool description',
+      imageUrl: 'Image url placeholder'
+    });
+
+    poll = await Poll.create({
+      organization: org._id,
+      title: 'Cool Poll',
+      description: 'Super cool poll',
+      options: ['approve', 'disapprove']
+    });
+
+    user = await User.create({
+      name: 'Jake',
+      phone: '123-123-4567',
+      email: 'placeholder@email.com',
+      communicationMedium: 'email',
+      imageUrl: 'Image url placeholder'
+    });
+
+    vote = await Vote.create({
+      poll: poll._id, user: user._id, options: 'yes'
+    });
+  });
+  
+
   it('it creates an organization', () => {
     return request(app)
       .post('/api/v1/organizations')
@@ -50,12 +83,8 @@ describe('voting app routes', () => {
   /////////////Organization tests
 
   it('it gets all organizations but leaves out the description', () => {
-    return Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    })
-      .then(() => request(app).get('/api/v1/organizations'))
+    
+    return request(app).get('/api/v1/organizations')
       .then(res => {
         expect(res.body).toEqual([{
           _id: expect.anything(),
@@ -282,7 +311,7 @@ describe('voting app routes', () => {
   });
 
 
-  it.only('it gets a poll and organization info by id with GET', async() => {
+  it('it gets a poll and organization info by id with GET', async() => {
     const org = await Organization.create({
       title: 'Cool Organization',
       description: 'Cool description',
@@ -311,7 +340,8 @@ describe('voting app routes', () => {
             title: 'Cool Organization',
             __v: 0
           },          
-          title: 'Cool Poll'
+          title: 'Cool Poll',
+          votes: 0
         });
       });
   });
@@ -376,20 +406,7 @@ describe('voting app routes', () => {
   ///////////////////Membership tests
 
   it('it creates a new member with POST', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
     
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
     return request(app).post('/api/v1/memberships')
       .send({
         organization: org._id,
@@ -406,20 +423,7 @@ describe('voting app routes', () => {
   });
 
   it('it gets all users in an organization', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
     
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
     await Membership.create({
       organization: org._id,
       user: user._id
@@ -434,20 +438,7 @@ describe('voting app routes', () => {
   });
 
   it('it gets all organizations a user is part of', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
     
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
     await Membership.create({
       organization: org._id,
       user: user._id
@@ -462,20 +453,7 @@ describe('voting app routes', () => {
   });
 
   it('it deletes a membership by id with DELETE', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
     
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
     const member = await Membership.create({
       organization: org._id,
       user: user._id
@@ -498,27 +476,7 @@ describe('voting app routes', () => {
   ///////////////Vote tests
 
   it('it creates a new vote with POST', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
     
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
-    const poll = await Poll.create({
-      organization: org._id,
-      title: 'Cool Poll',
-      description: 'Super cool poll',
-      options: ['approve', 'disapprove']
-    });
-
     return request(app).post('/api/v1/votes/')
       .send({ poll: poll._id, user: user._id, options: 'yes' })
       .then(res => {
@@ -533,25 +491,12 @@ describe('voting app routes', () => {
   });
 
   it('it gets all votes on a poll by id with GET', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
-
+    
     const poll = await Poll.create({
       organization: org._id,
       title: 'Cool Poll',
       description: 'Super cool poll',
       options: ['approve', 'disapprove']
-    });
-
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
     });
 
     const vote = await Vote.create({
@@ -568,31 +513,7 @@ describe('voting app routes', () => {
   });
 
   it('it gets all votes by a user by id with GET', async() => {
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
-
-    const poll = await Poll.create({
-      organization: org._id,
-      title: 'Cool Poll',
-      description: 'Super cool poll',
-      options: ['approve', 'disapprove']
-    });
-
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
-    const vote = await Vote.create({
-      poll: poll._id, user: user._id, options: 'yes'
-    });
-
+    
     return request(app)
       .get(`/api/v1/votes/user/${user._id}`)
       .then(res => {
@@ -603,31 +524,6 @@ describe('voting app routes', () => {
   });
 
   it('it updates a vote by it\'s id with PATCH', async() => {
-
-    const org = await Organization.create({
-      title: 'Cool Organization',
-      description: 'Cool description',
-      imageUrl: 'Image url placeholder'
-    });
-
-    const poll = await Poll.create({
-      organization: org._id,
-      title: 'Cool Poll',
-      description: 'Super cool poll',
-      options: ['approve', 'disapprove']
-    });
-
-    const user = await User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    });
-
-    const vote = await Vote.create({
-      poll: poll._id, user: user._id, options: 'yes'
-    });
 
     return request(app)
       .patch(`/api/v1/votes/${vote._id}`)
