@@ -311,7 +311,8 @@ describe('voting app routes', () => {
             title: 'Cool Organization',
             __v: 0
           },          
-          title: 'Cool Poll'
+          title: 'Cool Poll',
+          votes: 0
         });
       });
   });
