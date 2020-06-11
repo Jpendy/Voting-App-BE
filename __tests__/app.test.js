@@ -105,7 +105,7 @@ describe('voting app routes', () => {
       });
   });
 
-  it('it deletes an organization by id with DELETE', () => {
+  it('it deletes an organization by id with DELETE and deletes all polls and votes associated with that organization', async() => {
     return Organization.create({
       title: 'Cool Organization',
       description: 'Cool description',
@@ -282,7 +282,7 @@ describe('voting app routes', () => {
   });
 
 
-  it('it gets a poll and organization info by id with GET', async() => {
+  it.only('it gets a poll and organization info by id with GET', async() => {
     const org = await Organization.create({
       title: 'Cool Organization',
       description: 'Cool description',
