@@ -56,7 +56,9 @@ describe('voting app routes', () => {
     });
 
     vote = await Vote.create({
-      poll: poll._id, user: user._id, options: 'yes'
+      poll: poll._id, 
+      user: user._id, 
+      options: 'yes'
     });
 
     member = await Membership.create({
@@ -518,6 +520,26 @@ describe('voting app routes', () => {
           __v: 0
         });
       });
+  });
+
+  it('it only allows users to vote once, if they try to create a new vote it updates the old vote', async() => {
+   
+    await request(app)
+      .post('/api/v1/votes/')
+      .send({
+        poll: poll._id, 
+        user: user._id, 
+        options: 'yes'
+      });   
+
+    return request(app)
+      .get('/api/v1/votes/')
+      .then(res => {
+        expect(res.body).toEqual(
+          [{ '__v': 0, '_id': expect.anything(), 'options': 'yes', 'poll': { '__v': 0, '_id': expect.anything(), 'description': 'Super cool poll', 'options': ['approve', 'disapprove'], 'organization': expect.anything(), 'title': 'Cool Poll' }, 'user': expect.anything() }]
+        );
+      });
+      
   });
 
   it('it gets all votes on a poll by id with GET', async() => {
