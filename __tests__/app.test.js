@@ -101,7 +101,7 @@ describe('voting app routes', () => {
       });     
   });
 
-  it.only('it get an organization and all it\'s members by id with GET', () => {
+  it('it get an organization and all it\'s members by id with GET', () => {
    
     return request(app)
       .get(`/api/v1/organizations/${org._id}`)
@@ -191,14 +191,9 @@ describe('voting app routes', () => {
   });
 
   it('it gets a user by id with GET', () => {
-    return User.create({
-      name: 'Jake',
-      phone: '123-123-4567',
-      email: 'placeholder@email.com',
-      communicationMedium: 'email',
-      imageUrl: 'Image url placeholder'
-    })
-      .then(user => request(app).get(`/api/v1/users/${user._id}`))
+   
+    return request(app)
+      .get(`/api/v1/users/${user._id}`)
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.anything(),
@@ -207,7 +202,19 @@ describe('voting app routes', () => {
           email: 'placeholder@email.com',
           communicationMedium: 'email',
           imageUrl: 'Image url placeholder',
-          __v: 0
+          __v: 0,
+          organizations: [{
+            _id: expect.anything(),
+            __v: 0,
+            organization: {
+              _id: expect.anything(),
+              description: 'Cool description',
+              imageUrl: 'Image url placeholder',
+              title: 'Cool Organization',
+              __v: 0
+            },
+            user: expect.anything()
+          }],
         });
       });
   });
@@ -450,7 +457,7 @@ describe('voting app routes', () => {
     return request(app).get(`/api/v1/memberships?organization=${org._id}`)
       .then(res => {
         expect(res.body).toEqual(
-          [{ __v: 0, _id: expect.anything(), organization: { _id: expect.anything(), imageUrl: 'Image url placeholder', title: 'Cool Organization' }, user: { _id: expect.anything(), imageUrl: 'Image url placeholder' } }]
+          [{ '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization' }, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder' } }, { '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization' }, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder' } }]
         );
       });
   });
@@ -465,7 +472,7 @@ describe('voting app routes', () => {
     return request(app).get(`/api/v1/memberships?user=${user._id}`)
       .then(res => {
         expect(res.body).toEqual(
-          [{ '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization' }, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder' } }]
+          [{ '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization' }, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder' } }, { '__v': 0, '_id': expect.anything(), 'organization': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder', 'title': 'Cool Organization' }, 'user': { '_id': expect.anything(), 'imageUrl': 'Image url placeholder' } }]
         );
       });
   });
