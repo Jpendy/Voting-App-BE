@@ -523,20 +523,20 @@ describe('voting app routes', () => {
   });
 
   it('it only allows users to vote once, if they try to create a new vote it updates the old vote', async() => {
-   
+    //created a vote already up above in the beforeEach()
     await request(app)
       .post('/api/v1/votes/')
       .send({
         poll: poll._id, 
         user: user._id, 
-        options: 'yes'
+        options: 'no'
       });   
 
     return request(app)
       .get('/api/v1/votes/')
       .then(res => {
         expect(res.body).toEqual(
-          [{ '__v': 0, '_id': expect.anything(), 'options': 'yes', 'poll': { '__v': 0, '_id': expect.anything(), 'description': 'Super cool poll', 'options': ['approve', 'disapprove'], 'organization': expect.anything(), 'title': 'Cool Poll' }, 'user': expect.anything() }]
+          [{ '__v': 0, '_id': expect.anything(), 'options': 'no', 'poll': { '__v': 0, '_id': expect.anything(), 'description': 'Super cool poll', 'options': ['approve', 'disapprove'], 'organization': expect.anything(), 'title': 'Cool Poll' }, 'user': expect.anything() }]
         );
       });
       
