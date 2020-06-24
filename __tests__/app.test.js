@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongod = new MongoMemoryServer();
 const mongoose = require('mongoose');
@@ -11,6 +12,7 @@ const User = require('../lib/models/User');
 const Poll = require('../lib/models/Poll');
 const Membership = require('../lib/models/Membership');
 const Vote = require('../lib/models/Vote');
+const seed = require('../data-helpers/seed');
 
 describe('voting app routes', () => {
   beforeAll(async() => {
@@ -64,8 +66,7 @@ describe('voting app routes', () => {
     member = await Membership.create({
       organization: org._id,
       user: user._id
-    });
-    
+    });    
   });
 
 

@@ -46,8 +46,5 @@ const seed = async({ userCount = 5, organizationCount = 10, pollCount = 20, vote
   })));
 };
 
-seed()
-  .then(() => mongoose.connection.close());
-
 
 module.exports = seed;
