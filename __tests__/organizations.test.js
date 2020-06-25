@@ -12,7 +12,6 @@ const User = require('../lib/models/User');
 const Poll = require('../lib/models/Poll');
 const Membership = require('../lib/models/Membership');
 const Vote = require('../lib/models/Vote');
-const seed = require('../data-helpers/seed');
 
 describe('voting app routes', () => {
   beforeAll(async() => {

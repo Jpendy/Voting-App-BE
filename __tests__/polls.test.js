@@ -70,13 +70,19 @@ describe('voting app routes', () => {
   });
 
   it('it gets the vote count in a poll by id and the results of the votes with GET', async() => {
-    console.log(poll);
     return request(app)
       .get(`/api/v1/polls/results/${poll.id}`)
       .then(res => {
         expect(res.body).toEqual([{ '_id': expect.anything(), 'options': [{ 'count': 1, 'options': 'yes' }], 'totalCount': 1 }]);
       });
+  });
 
+  it('it gets the average number of votes per poll', () => {
+    return request(app)
+      .get('/api/v1/polls/average')
+      .then(res => {
+        expect(res.body).toEqual([{ '_id': null, 'avg': 1 }]);
+      });
   });
 
 });
