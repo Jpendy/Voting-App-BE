@@ -31,8 +31,6 @@ describe('voting app routes', () => {
   let org; 
   let user;
   let poll;
-  let vote;
-  let member;
 
   beforeEach(async() => {
     org = await Organization.create({
@@ -56,13 +54,13 @@ describe('voting app routes', () => {
       imageUrl: 'Image url placeholder'
     });
 
-    vote = await Vote.create({
+    await Vote.create({
       poll: poll._id, 
       user: user._id, 
       options: 'yes'
     });
 
-    member = await Membership.create({
+    await Membership.create({
       organization: org._id,
       user: user._id
     });    
